@@ -1,0 +1,33 @@
+import numpy as np
+import matplotlib.pyplot as plt
+def func(p,theta=0.0001,gamma=1):
+    rewards = np.zeros(101)
+    rewards[100] = 1
+    value = np.zeros(101)
+    def ahead(cap,rewards):
+        expected = np.zeros(101)
+        for a in range(1,min(cap,100-cap)+1):
+            expected[a] = p*(rewards[cap+a] + gamma*value[cap+a])+(1-p)*(rewards[cap-a] + gamma*value[cap-a])
+        return expected
+
+    while True :
+        delta=0
+        for cap in range (1,100) :
+            best_action = np.max(ahead(cap,rewards))
+            delta = max(delta,np.abs(best_action - value[cap]))
+            value[cap] = best_action
+        if delta < theta :
+            break
+    
+    policy = np.zeros(100)
+    for cap in range(1,100):
+        policy[cap] = np.argmax(ahead(cap,value,rewards))
+    return policy,value
+
+
+policy,value = func(0.25)
+print ("policy : ")
+print (policy)
+print ("")
+print ("value function : ")
+print (value)
